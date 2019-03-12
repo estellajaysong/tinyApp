@@ -10,9 +10,14 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-  <%= "URL: " + longURL + " Shortened: " + shortURL%>
+  <% include ./partials/_header.ejs %>
+  <a href="#">Create New TinyURL</a>
+  <br>
+  <br>
+  <h3>TinyURL for <%= longURL %></h3>
+  <%= shortURL %>
 <br>
-<a href="#">Create a new URL</a>
+
   
 </body>
 </html>
