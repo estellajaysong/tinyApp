@@ -11,13 +11,14 @@
 
 <body style="font-size:20px; padding:50px;">
   <% include ./partials/_header.ejs %>
-  <a href="urls/new">Create New TinyURL</a>
+  <a href="new">Create New TinyURL</a>
   <br>
   <br>
   <h3>My URLs</h3>
 <ul style="list-style-type:circle;">
   <%for (url in urls) {%>
   <li><%= url + ": " + urls[url] %></li>
+  <form method="POST" action="/urls/<%= url %>/delete"><button type="delete" style="background-color:#FFC0CB; border: none" class="btn btn-primary">delete &#128465;</button></form>
   <%}%>
 </ul>
   

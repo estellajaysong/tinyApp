@@ -14,10 +14,15 @@
   <a href="new">Create New TinyURL</a>
   <br>
   <br>
-  <h3>TinyURL for <%= longURL %></h3>
-  <%= shortURL %>
-<br>
-
+  <h3>ShortURL: <%= shortURL %></h3>
+<form class="form-inline" action="/urls/<%= shortURL %>/update" method="POST">
+<input type="hidden" name="shortURL" value="<%= shortURL %>" />
+  <div class="form-group mb-2">
+    <label for="newURL">Enter a URL:</label>
+    <input class="form-control" type="text" name="newURL" placeholder="<%= longURL %>" style="width: 300px; margin: 1em">
+    <button type="update" style="background-color:#FFC0CB; border: none" class="btn btn-primary">Update</button>
+  </div>
+</form>
   
 </body>
 </html>
