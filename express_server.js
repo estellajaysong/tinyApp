@@ -21,6 +21,11 @@ let urlDatabase = {
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
+app.post("/urls", (req, res) => {
+  let shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL
+  res.redirect(`/urls/${shortURL}`);         // Respond with 'Ok' (we will replace this)
+});
 app.get("/urls", (req, res) => {
     let templateVars = { urls: urlDatabase, username: req.cookies["username"] };
     res.render("urls_index", templateVars);
@@ -38,12 +43,6 @@ app.get("/urls.json", (req, res) => {
   });
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString();
-  let templateVars = { username: req.cookies["username"] };
-  urlDatabase[shortURL] = req.body.longURL
-  res.redirect(`/urls/${shortURL}`, templateVars);         // Respond with 'Ok' (we will replace this)
 });
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
