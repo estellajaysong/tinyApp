@@ -98,7 +98,11 @@ app.get("/login", (req, res) => {
 });
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase, userID: req.cookies["userID"], user: users[req.cookies.userID] };
-  res.render("urls_index", templateVars);
+  if (req.cookies.userID){
+  res.render("urls_index", templateVars)
+  } else {
+  res.redirect("login")
+  };
 });
 app.get("/urls/new", (req, res) => {
   let templateVars = { userID: req.cookies["userID"], user: users[req.cookies.userID] };
@@ -134,8 +138,6 @@ app.get("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL] 
   res.redirect('/urls');     
 });
-
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
