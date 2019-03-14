@@ -1,6 +1,6 @@
 <h1>TinyApp</h1>
 <% if (username) { %>
-<form class="form-inline" method="GET" action="/logout">
+<form class="form-inline" method="POST" action="/logout">
 <div>Logged in as <%= username %>
 <button type="logout" style="background-color:#FFC0CB; border: none" class="btn btn-primary">Logout</button></form>
 </div>
