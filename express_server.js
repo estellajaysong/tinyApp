@@ -60,15 +60,32 @@ app.get("/register", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] };
   res.render("register", templateVars);
 });
+function emailCheck(email, password) {
+  if (email === "" || password === "") {
+    return "empty"
+  }
+  for (user in users) {
+    if (users[user].email === email) {
+      return "duplicate"
+    }
+  }
+  return "ok"
+}
 app.post("/register", (req, res) => {
-  let newUser = req.body;
-  let newID = generateRandomString();
-  users[newID] = {};
-  users[newID].id = newID;
-  users[newID].email = req.body.email;
-  users[newID].password = req.body.password;
-  res.cookie("userID", newID);
-  res.redirect("/urls");
+  // emailCheck(req.body.email)
+  if (emailCheck(req.body.email, req.body.password) === "ok"){
+    let newID = generateRandomString();
+    users[newID] = {};
+    users[newID].id = newID;
+    users[newID].email = req.body.email;
+    users[newID].password = req.body.password;
+    res.cookie("userID", newID);
+    res.redirect("/urls");
+  } else {
+    res.statusCode = 400;
+    console.log(res.statusCode)
+  };
+  
 });
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
