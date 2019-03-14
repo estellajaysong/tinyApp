@@ -3,11 +3,11 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 function generateRandomString() {
-  return Math.random().toString(36).replace('0.', '').slice(4)
-}
+  return Math.random().toString(36).replace('0.', '').slice(4);
+};
 //cookie-parser
 const cookieParser = require('cookie-parser')
-app.use(cookieParser())
+app.use(cookieParser());
 //
 
 app.set("view engine", "ejs") // EJS as templating engine
@@ -28,11 +28,8 @@ const users = {
     email: "user2@example.com", 
     password: "dishwasher-funk"
   }
-}
+};
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL
@@ -41,16 +38,29 @@ app.post("/urls", (req, res) => {
 function emailCheck(email, password) {
   if (email === "" || password === "") {
     return "empty"
-  }
+  };
   for (user in users) {
     if (users[user].email === email) {
-      return "duplicate"
-    }
-  }
+      return "duplicate";
+    };
+  };
   return "ok"
-}
+};
+function loginCheck(email, password) {
+  if (email === "" || password === "") {
+    return "empty";
+  };
+  for (user in users) {
+    if (users[user].email === email) {
+      if (users[user].password === password) {
+        return user;
+      }
+      return "wrong password";
+    };
+  };
+  return "email not found";
+};
 app.post("/register", (req, res) => {
-  // emailCheck(req.body.email)
   if (emailCheck(req.body.email, req.body.password) === "ok"){
     let newID = generateRandomString();
     users[newID] = {};
@@ -61,24 +71,46 @@ app.post("/register", (req, res) => {
     res.redirect("/urls");
   } else {
     res.statusCode = 400;
-    console.log(res.statusCode)
   };
 });
+app.post("/urls/:shortURL/update", (req, res) => {
+  let newURL = req.body.newURL
+  urlDatabase[req.body.shortURL] = newURL
+  res.redirect('/urls')  
+});
+app.post("/login", (req, res) => {
+  if ((loginCheck(req.body.email, req.body.password)) === user) {
+    res.cookie("userID", user);
+    res.redirect('/urls');    
+  } else {
+    res.statusCode = 403;
+  }
+});
+app.post("/logout", (req, res) => {
+  res.clearCookie('userID')
+  res.redirect('/urls')  
+});
+app.get("/", (req, res) => {
+  res.send("Hello!");
+});
+app.get("/login", (req, res) => {
+  res.render("login")
+});
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase, userID: req.cookies["userID"], user: users[req.cookies.userID] };
-    res.render("urls_index", templateVars);
-  });
+  let templateVars = { urls: urlDatabase, userID: req.cookies["userID"], user: users[req.cookies.userID] };
+  res.render("urls_index", templateVars);
+});
 app.get("/urls/new", (req, res) => {
   let templateVars = { userID: req.cookies["userID"], user: users[req.cookies.userID] };
-    res.render("urls_new", templateVars);
-  });
+  res.render("urls_new", templateVars);
+});
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userID: req.cookies["userID"], user: users[req.cookies.userID] };
   res.render("urls_show", templateVars);
-  });  
+});  
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-  });
+});
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
@@ -89,32 +121,19 @@ app.get("/register", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
   let templateVars = { userID: req.cookies["userID"], user: users[req.cookies.userID] };
+  
   if (longURL.slice(0, 4) === "www.") {
     longURL = "http://" + longURL;
   }
   else if (longURL.slice(0, 7) !== "http://" && longURL.slice(7, 11) !== "www.") {
     longURL = "http://www." + longURL;
-  }
+  };
   res.redirect(longURL);
 });
 app.get("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL] 
   res.redirect('/urls');     
 });
-app.post("/urls/:shortURL/update", (req, res) => {
-  let newURL = req.body.newURL
-  urlDatabase[req.body.shortURL] = newURL
-  res.redirect('/urls')  
-});
-app.post("/login", (req, res) => {
-  res.cookie('userID', req.body.userID)
-  res.redirect('/urls')  
-});
-app.post("/logout", (req, res) => {
-  res.clearCookie('userID')
-  res.redirect('/urls')  
-});
-
 
 
 app.listen(PORT, () => {
