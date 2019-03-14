@@ -14,14 +14,15 @@ app.set("view engine", "ejs") // EJS as templating engine
 app.use(bodyParser.urlencoded({extended: true}));
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
+console.log(urlDatabase.i3BoGr)
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: "purple-monkey-dinosaur",
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -35,6 +36,17 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL
   res.redirect(`/urls/${shortURL}`);         // Respond with 'Ok' (we will replace this)
 });
+function urlsForUser(id) {
+  let userUrls = {};
+  for (url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      userUrls[url] = {};
+      userUrls[url].shortURL = url;
+      userUrls[url].longURL = urlDatabase[url].longURL;
+    }
+  }
+  return userUrls;
+}
 function emailCheck(email, password) {
   if (email === "" || password === "") {
     return "empty"
@@ -105,7 +117,7 @@ app.get("/urls/new", (req, res) => {
   if (req.cookies.userID){
     res.render("urls_new", templateVars)
     } else {
-    res.redirect("login")
+    res.redirect("/login")
     };  
 });
 app.get("/urls/:shortURL", (req, res) => {
