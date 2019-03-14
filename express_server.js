@@ -98,15 +98,15 @@ app.get("/login", (req, res) => {
 });
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase, userID: req.cookies["userID"], user: users[req.cookies.userID] };
-  if (req.cookies.userID){
-  res.render("urls_index", templateVars)
-  } else {
-  res.redirect("login")
-  };
+  res.render("urls_index", templateVars);
 });
 app.get("/urls/new", (req, res) => {
   let templateVars = { userID: req.cookies["userID"], user: users[req.cookies.userID] };
-  res.render("urls_new", templateVars);
+  if (req.cookies.userID){
+    res.render("urls_new", templateVars)
+    } else {
+    res.redirect("login")
+    };  
 });
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userID: req.cookies["userID"], user: users[req.cookies.userID] };
