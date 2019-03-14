@@ -13,10 +13,22 @@ app.use(cookieParser())
 app.set("view engine", "ejs") // EJS as templating engine
 app.use(bodyParser.urlencoded({extended: true}));
 
-let urlDatabase = {
+const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -47,6 +59,16 @@ app.get("/hello", (req, res) => {
 app.get("/register", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] };
   res.render("register", templateVars);
+});
+app.post("/register", (req, res) => {
+  let newUser = req.body;
+  let newID = generateRandomString();
+  users[newID] = {};
+  users[newID].id = newID;
+  users[newID].email = req.body.email;
+  users[newID].password = req.body.password;
+  res.cookie("userID", newID);
+  res.redirect("/urls");
 });
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
