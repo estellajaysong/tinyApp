@@ -5,6 +5,11 @@ const bodyParser = require("body-parser");
 function generateRandomString() {
   return Math.random().toString(36).replace('0.', '').slice(4)
 }
+//cookie-parser
+const cookieParser = require('cookie-parser')
+app.use(cookieParser())
+//
+
 app.set("view engine", "ejs") // EJS as templating engine
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -17,14 +22,15 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase };
+    let templateVars = { urls: urlDatabase, username: req.cookies["username"] };
     res.render("urls_index", templateVars);
   });
 app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
+  let templateVars = { username: req.cookies["username"] };
+    res.render("urls_new", templateVars);
   });
 app.get("/urls/:shortURL", (req, res) => {
-    let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+    let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] };
     res.render("urls_show", templateVars);
   });  
 app.get("/urls.json", (req, res) => {
@@ -35,11 +41,13 @@ app.get("/hello", (req, res) => {
 });
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
+  let templateVars = { username: req.cookies["username"] };
   urlDatabase[shortURL] = req.body.longURL
-  res.redirect(`/urls/${shortURL}`);         // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${shortURL}`, templateVars);         // Respond with 'Ok' (we will replace this)
 });
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
+   let templateVars = { username: req.cookies["username"] };
   if (longURL.slice(0, 4) === "www.") {
     longURL = "http://" + longURL;
   }
@@ -55,6 +63,14 @@ app.get("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/update", (req, res) => {
   let newURL = req.body.newURL
   urlDatabase[req.body.shortURL] = newURL
+  res.redirect('/urls')  
+});
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username)
+  res.redirect('/urls')  
+});
+app.post("/logout", (req, res) => {
+  res.cookie('username', req.body.username)
   res.redirect('/urls')  
 });
 
