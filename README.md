@@ -4,8 +4,8 @@ TinyApp is a full stack web application build with Node and Express that allows 
 
 ## Final Product
 
-!["Main URLs page when you first visit TinyApp"](#)
-!["URLs page after you have logged in and shortened a few URLs"](#)
+!["Main URLs page when you first visit TinyApp"](https://github.com/estellajaysong/tinyApp/blob/master/docs/TinyApp%20Homepage.png?raw=true)
+!["URLs page after you have logged in and shortened a few URLs"](https://github.com/estellajaysong/tinyApp/blob/master/docs/TinyApp%20URLs%20page%20-%20logged%20in.png?raw=true)
 
 ## Dependencies 
 
