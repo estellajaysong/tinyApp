@@ -179,7 +179,7 @@ app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
-app.get("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => {
   if (req.session.userID === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL]
   } else {

@@ -19,7 +19,7 @@
   <%for (url in urls) {%>
   <li><%= urls[url].shortURL + " — " + urls[url].longURL %></li>
   <a href="/urls/<%= url %>">Edit</a>
-  <form method="GET" action="/urls/<%= url %>/delete"><button type="delete" style="background-color:#FFC0CB; border: none" class="btn btn-primary">delete &#128465;</button></form>
+  <form method="POST" action="/urls/<%= url %>/delete"><button type="delete" style="background-color:#FFC0CB; border: none" class="btn btn-primary">delete &#128465;</button></form>
   <%}%>
 </ul>
 
