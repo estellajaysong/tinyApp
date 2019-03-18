@@ -29,9 +29,11 @@ const users = {
   }
 };
 
+// generates user ID, as well as short URLs
 function generateRandomString() {
   return Math.random().toString(36).replace('0.', '').slice(4);
 };
+// creates an object of the URLs created by a specific user
 function urlsForUser(id) {
   let userUrls = {};
   for (url in urlDatabase) {
@@ -43,6 +45,7 @@ function urlsForUser(id) {
   }
   return userUrls;
 }
+// checks to see if the registration form submitted has empty fields, an existing account. or is acceptable
 function emailCheck(email, password) {
   if (email === "" || password === "") {
     return "empty";
@@ -54,6 +57,7 @@ function emailCheck(email, password) {
   };
   return "ok";
 };
+// checks to see if the login form submitted has empty fields, does not exist, or is acceptable
 function loginCheck(email, password) {
   if (email === "" || password === "") {
     return "empty";
@@ -69,18 +73,16 @@ function loginCheck(email, password) {
   };
   return "email not found";
 };
+// converts the long URL submitted to proper format if the user did not include "https://"
 function urlConvert(longURL) {
   if (longURL.slice(0, 4) === "www.") {
     longURL = "https://" + longURL;
-  }
-  else if (longURL.slice(0, 7) !== "http://" && longURL.slice(7, 11) !== "www.") {
-    longURL = "http://www." + longURL;
-  }
-  else if (longURL.slice(0, 8) !== "https://" && longURL.slice(8, 12) !== "www.") {
-    longURL = "https://www." + longURL;
+  } else if (longURL.slice(0, 8) !== "https://" && longURL.slice(0, 7) !== "http://") {
+    longURL = "https://" + longURL;
   };
   return longURL;
 };
+// creates a new short URL/long URL and adds it to the database
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = {};
@@ -88,6 +90,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL].userID = req.session.userID;
   res.redirect(`/urls/${shortURL}`);         
 });
+// creates a new account
 app.post("/register", (req, res) => {
   if (emailCheck(req.body.email, req.body.password) === "ok") {
     let newID = generateRandomString();
@@ -105,6 +108,7 @@ app.post("/register", (req, res) => {
     res.statusCode = 400;
   }
 });
+// updates a short URL with a new long URL
 app.post("/urls/:shortURL/update", (req, res) => {
   if (req.session.userID === urlDatabase[req.params.shortURL].userID) {
     let newURL = urlConvert(req.body.newURL);
@@ -112,6 +116,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
   }
   res.redirect('/urls');
 });
+// sees if the user has the right credential to log in
 app.post("/login", (req, res) => {
   if ((loginCheck(req.body.email, req.body.password)) === user) {
     req.session.userID = user;
@@ -121,6 +126,7 @@ app.post("/login", (req, res) => {
     res.statusCode = 403;
   }
 });
+// clears cookies
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect('/urls');
@@ -140,6 +146,8 @@ app.get("/urls", (req, res) => {
     res.render("urls_index", templateVars);
   }
 });
+// the user is allowed to create a new URL only if they are logged in. otherwise, they are redirected to the 
+// login page
 app.get("/urls/new", (req, res) => {
   let templateVars = { userID: req.session.userID, user: users[req.session.userID] };
   if (req.session.isNew === false) {
@@ -148,6 +156,8 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
   };
 });
+// if the user is not signed in, they are prompted to log in. if the user did not create that URL, they are 
+// barred access. otherwise, they are allowed access to modify that URL
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userID: req.session.userID, user: users[req.session.userID] };
   if (!req.session.userID) {
